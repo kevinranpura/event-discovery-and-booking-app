@@ -1,0 +1,23 @@
+-- seed.sql
+-- Demo data for Event Discovery & Booking App
+
+-- Demo Users (Password: password123, pre-hashed using bcryptjs)
+INSERT INTO users (name, email, mobile, password, role) VALUES
+('Jane Doe', 'user@example.com', '+1-555-0101', '$2a$10$w8T9V.bBw8pC0n1qE5h/teYf8F2sH6iK4mP0rL8vU2wX4yZ6aB8cC', 'user'),
+('Alex Rivera', 'organizer@example.com', '+1-555-0102', '$2a$10$w8T9V.bBw8pC0n1qE5h/teYf8F2sH6iK4mP0rL8vU2wX4yZ6aB8cC', 'organizer'),
+('Mike Johnson', 'mike@example.com', '+1-555-0103', '$2a$10$w8T9V.bBw8pC0n1qE5h/teYf8F2sH6iK4mP0rL8vU2wX4yZ6aB8cC', 'user')
+ON CONFLICT (email) DO NOTHING;
+
+-- Demo Events (Linked to Organizer ID 2)
+INSERT INTO events (organizer_id, name, description, category, image, date, start_time, end_time, venue, address, ticket_price, total_seats, available_seats) VALUES
+(2, 'Summer Music Festival 2026', 'Experience an electrifying three-day live open-air music experience featuring multi-genre headliners and immersive soundstages.', 'Music', 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1000&q=80', '2026-10-15', '16:00', '23:30', 'Central Park Amphitheater', 'Central Park, New York, NY 10022', 79.99, 400, 396),
+(2, 'Tech Innovation Summit', 'Annual tech conference exploring breakthrough generative AI, edge computing, quantum systems, and sustainable tech engineering.', 'Technology', 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1000&q=80', '2026-10-20', '09:00', '18:00', 'Silicon Valley Convention Center', '500 W San Carlos St, San Jose, CA 95110', 149.99, 200, 198),
+(2, 'Global Marathon & 10K Run', 'Join thousands of passionate runners through scenic city skylines, waterfront paths, and competitive timed categories.', 'Sports', 'https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?auto=format&fit=crop&w=1000&q=80', '2026-10-25', '06:30', '12:00', 'Downtown Waterfront Promenade', '100 Marina Blvd, San Francisco, CA 94123', 45.00, 500, 500),
+(2, 'Venture Capital & Startup Gala', 'High-impact networking gala connecting accredited angel investors, leading venture capital funds, and high-growth founders.', 'Business', 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1000&q=80', '2026-11-02', '18:00', '22:00', 'Grand Hyatt Ballroom', '109 E 42nd St, New York, NY 10017', 199.00, 150, 150),
+(2, 'Masterclass in Modern UI Design', 'Comprehensive design sprint covering micro-interactions, cohesive typography, accessibility patterns, and modern design systems.', 'Education', 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=1000&q=80', '2026-11-08', '10:00', '16:00', 'Design Hub Co-working', '750 N Michigan Ave, Chicago, IL 60611', 89.00, 50, 50),
+(2, 'Artisan Ceramic Pottery Workshop', 'Hands-on wheel throwing, glazing techniques, and kiln firing led by accomplished ceramic masters in an intimate studio space.', 'Workshops', 'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=1000&q=80', '2026-11-12', '14:00', '17:30', 'SoHo Clay Works Studio', '420 Broome St, New York, NY 10013', 65.00, 30, 30),
+(2, 'Stand-up Comedy All-Stars Night', 'An unforgettable evening of side-splitting laughter featuring headline touring comedians and special guest appearances.', 'Entertainment', 'https://images.unsplash.com/photo-1585699324551-f6c309eedeca?auto=format&fit=crop&w=1000&q=80', '2026-11-15', '20:00', '22:30', 'Laugh Factory Main Stage', '8001 Sunset Blvd, Los Angeles, CA 90046', 35.00, 180, 180),
+(2, 'Jazz Under the Stars', 'Intimate open-air rooftop evening with celebrated jazz trios performing cool bebop, soul jazz, and classic standards.', 'Music', 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&w=1000&q=80', '2026-10-18', '19:30', '22:30', 'Skyline Terrace Lounge', '300 S Biscayne Blvd, Miami, FL 33131', 59.99, 100, 100),
+(2, 'AI Developers Hackathon 2026', 'A 24-hour sprint to build groundbreaking autonomous agent tools, computer vision workflows, and generative pipelines.', 'Technology', 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1000&q=80', '2026-11-20', '08:00', '20:00', 'Innovation Campus Hall', '100 Tech Way, Seattle, WA 98101', 0.00, 120, 120),
+(2, 'Championship Soccer Derby', 'High-stakes regional derby matchup featuring top soccer franchises competing under stadium floodlights.', 'Sports', 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1000&q=80', '2026-11-28', '17:00', '19:30', 'Metropolitan Arena', '100 Stadium Dr, Austin, TX 78701', 49.50, 600, 600)
+ON CONFLICT DO NOTHING;
