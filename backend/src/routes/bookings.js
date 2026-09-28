@@ -5,6 +5,20 @@ const { authenticate } = require('../middleware/auth');
 
 const router = express.Router();
 
+const TICKET_MULTIPLIERS = {
+  General: 1.0,
+  VIP: 1.8,
+  'Early Bird': 0.8,
+  Student: 0.7,
+};
+
+function getTicketPrice(basePrice, ticketType) {
+  const base = parseFloat(basePrice);
+  if (isNaN(base) || base === 0) return 0;
+  const mult = TICKET_MULTIPLIERS[ticketType] ?? 1.0;
+  return Math.round(base * mult);
+}
+
 // POST /api/bookings
 router.post('/', authenticate, [
   body('event_id').isInt().withMessage('Valid event ID is required'),
@@ -52,7 +66,11 @@ router.post('/', authenticate, [
       return res.status(400).json({ success: false, message: 'Cannot book tickets for past events' });
     }
 
-    const total_amount = parseFloat(event.ticket_price) * parseInt(quantity);
+    const basePrice = parseFloat(event.ticket_price);
+    const unitPrice = getTicketPrice(basePrice, ticket_type);
+    const subtotal = unitPrice * parseInt(quantity);
+    const fee = basePrice === 0 ? 0 : Math.round(subtotal * 0.05);
+    const total_amount = subtotal + fee;
 
     // Create booking
     const bookingResult = await client.query(
@@ -218,5 +236,8 @@ router.put('/:id/cancel', authenticate, async (req, res) => {
     client.release();
   }
 });
+
+router.getTicketPrice = getTicketPrice;
+router.TICKET_MULTIPLIERS = TICKET_MULTIPLIERS;
 
 module.exports = router;

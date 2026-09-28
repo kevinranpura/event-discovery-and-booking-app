@@ -61,9 +61,40 @@ export const CATEGORIES: CategoryItem[] = [
   { id: 'entertainment', name: 'Entertainment', iconName: 'film-outline' },
 ];
 
-export const TICKET_TYPES = ['General', 'VIP', 'Student', 'Early Bird'] as const;
+export const TICKET_TYPES = ['General', 'VIP', 'Early Bird', 'Student'] as const;
+
+export const TICKET_MULTIPLIERS: Record<string, number> = {
+  General: 1.0,
+  VIP: 1.8,
+  'Early Bird': 0.8,
+  Student: 0.7,
+};
+
+export const TICKET_DETAILS: Record<string, { label: string; tag: string; description: string }> = {
+  General: {
+    label: 'General Admission',
+    tag: 'Standard',
+    description: 'Regular event access & standard seating',
+  },
+  VIP: {
+    label: 'VIP Experience',
+    tag: 'Premium',
+    description: 'Priority check-in, premium seating & lounge access',
+  },
+  'Early Bird': {
+    label: 'Early Bird',
+    tag: '20% OFF',
+    description: 'Discounted advance booking while seats last',
+  },
+  Student: {
+    label: 'Student Pass',
+    tag: '30% OFF',
+    description: 'Discounted entry for students (ID check at gate)',
+  },
+};
 
 export const API_URL =
   typeof window !== 'undefined'
     ? 'http://localhost:3000'
     : process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
+

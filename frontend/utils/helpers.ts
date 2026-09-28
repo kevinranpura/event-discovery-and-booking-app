@@ -19,16 +19,25 @@ export function formatTime(timeStr: string): string {
   return `${hour12}:${minutes} ${ampm}`;
 }
 
+import { TICKET_MULTIPLIERS } from '../constants';
+
+export function getTicketPrice(basePrice: number | string, ticketType: string): number {
+  const base = parseFloat(String(basePrice));
+  if (isNaN(base) || base === 0) return 0;
+  const mult = TICKET_MULTIPLIERS[ticketType] ?? 1.0;
+  return Math.round(base * mult);
+}
+
 export function formatPrice(price: number | string): string {
   const num = parseFloat(String(price));
   if (isNaN(num) || num === 0) return 'Free';
-  return `$${num.toFixed(2)}`;
+  return `₹${Math.round(num).toLocaleString('en-IN')}`;
 }
 
 export function formatCurrency(amount: number | string): string {
   const num = parseFloat(String(amount));
-  if (isNaN(num)) return '$0.00';
-  return `$${num.toFixed(2)}`;
+  if (isNaN(num)) return '₹0';
+  return `₹${Math.round(num).toLocaleString('en-IN')}`;
 }
 
 export function calculateTotal(
@@ -37,7 +46,7 @@ export function calculateTotal(
   feeRate = 0.05
 ): { subtotal: number; fee: number; total: number } {
   const subtotal = price * quantity;
-  const fee = subtotal * feeRate;
+  const fee = price === 0 ? 0 : Math.round(subtotal * feeRate);
   const total = subtotal + fee;
   return { subtotal, fee, total };
 }

@@ -85,7 +85,7 @@ export default function OrganizerDashboard() {
     { label: 'Total Events', value: stats.totalEvents ?? stats.total_events ?? 0, iconName: 'calendar', color: COLORS.primary },
     { label: 'Upcoming', value: stats.upcomingEvents ?? stats.upcoming_events ?? 0, iconName: 'time', color: COLORS.success },
     { label: 'Total Bookings', value: stats.totalBookings ?? stats.total_bookings ?? 0, iconName: 'ticket', color: COLORS.warning },
-    { label: 'Revenue', value: `$${parseFloat(String(stats.totalRevenue ?? stats.total_revenue ?? 0)).toFixed(0)}`, iconName: 'wallet', color: '#10B981' },
+    { label: 'Revenue', value: `₹${Math.round(parseFloat(String(stats.totalRevenue ?? stats.total_revenue ?? 0))).toLocaleString('en-IN')}`, iconName: 'wallet', color: '#10B981' },
   ] : [];
 
   return (

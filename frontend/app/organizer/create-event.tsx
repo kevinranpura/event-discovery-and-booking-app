@@ -114,13 +114,13 @@ export default function CreateEventScreen() {
           </View>
 
           <Text style={[styles.groupTitle, { marginTop: 8 }]}>Location</Text>
-          <InputField label="Venue Name *" value={form.venue} onChangeText={(v) => update('venue', v)} placeholder="Central Park Amphitheater" leftIcon="business-outline" error={errors.venue} />
-          <InputField label="Full Address *" value={form.address} onChangeText={(v) => update('address', v)} placeholder="123 Main St, New York, NY 10001" leftIcon="location-outline" error={errors.address} />
+          <InputField label="Venue Name *" value={form.venue} onChangeText={(v) => update('venue', v)} placeholder="Jio World Convention Centre" leftIcon="business-outline" error={errors.venue} />
+          <InputField label="Full Address *" value={form.address} onChangeText={(v) => update('address', v)} placeholder="Bandra Kurla Complex, Bandra East, Mumbai, Maharashtra 400051" leftIcon="location-outline" error={errors.address} />
 
           <Text style={[styles.groupTitle, { marginTop: 8 }]}>Tickets</Text>
           <View style={styles.row}>
             <View style={{ flex: 1 }}>
-              <InputField label="Price ($) *" value={form.ticket_price} onChangeText={(v) => update('ticket_price', v)} placeholder="0 for free" leftIcon="card-outline" keyboardType="decimal-pad" error={errors.ticket_price} />
+              <InputField label="Price (₹) *" value={form.ticket_price} onChangeText={(v) => update('ticket_price', v)} placeholder="0 for free" leftIcon="card-outline" keyboardType="decimal-pad" error={errors.ticket_price} />
             </View>
             <View style={{ flex: 1 }}>
               <InputField label="Total Seats *" value={form.total_seats} onChangeText={(v) => update('total_seats', v)} placeholder="500" leftIcon="people-outline" keyboardType="number-pad" error={errors.total_seats} />

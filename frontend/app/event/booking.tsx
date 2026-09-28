@@ -16,8 +16,8 @@ import { useEventsStore } from '../../store/eventsStore';
 import { useBookingsStore } from '../../store/bookingsStore';
 import { PrimaryButton } from '../../components/PrimaryButton';
 import { LoadingIndicator } from '../../components/LoadingIndicator';
-import { COLORS, TICKET_TYPES } from '../../constants';
-import { formatDate, formatTime, formatPrice, calculateTotal, generateBookingId } from '../../utils/helpers';
+import { COLORS, TICKET_TYPES, TICKET_DETAILS } from '../../constants';
+import { formatDate, formatTime, formatPrice, calculateTotal, generateBookingId, formatCurrency, getTicketPrice } from '../../utils/helpers';
 
 export default function BookingScreen() {
   const { eventId } = useLocalSearchParams<{ eventId: string }>();
@@ -36,9 +36,9 @@ export default function BookingScreen() {
 
   if (!event) return <LoadingIndicator fullScreen message="Preparing checkout..." />;
 
-  const price = parseFloat(String(event.ticket_price));
-  const { subtotal, fee, total } = calculateTotal(price, quantity);
-  const isFree = price === 0;
+  const unitPrice = getTicketPrice(event.ticket_price, ticketType);
+  const { subtotal, fee, total } = calculateTotal(unitPrice, quantity);
+  const isFree = unitPrice === 0;
   const maxQty = Math.min(10, event.available_seats);
 
   const handleBook = async () => {
@@ -148,7 +148,7 @@ export default function BookingScreen() {
                       <Text style={styles.ticketLabel}>Total Paid</Text>
                     </View>
                     <Text style={[styles.ticketValue, { color: COLORS.text, fontWeight: '800' }]}>
-                      {isFree ? 'Free' : `$${total.toFixed(2)}`}
+                      {isFree ? 'Free' : formatCurrency(total)}
                     </Text>
                   </View>
                 </View>
@@ -249,24 +249,50 @@ export default function BookingScreen() {
           {/* Ticket Type */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Ticket Category</Text>
-            <View style={styles.typeGrid}>
+            <View style={styles.typeList}>
               {TICKET_TYPES.map((type) => {
                 const isActive = ticketType === type;
+                const catPrice = getTicketPrice(event.ticket_price, type);
+                const info = TICKET_DETAILS[type];
                 return (
                   <TouchableOpacity
                     key={type}
                     onPress={() => setTicketType(type)}
-                    style={[styles.typeChip, isActive && styles.typeChipActive]}
+                    style={[styles.typeOption, isActive && styles.typeOptionActive]}
                     activeOpacity={0.8}
                   >
-                    <Text
-                      style={[
-                        styles.typeChipText,
-                        isActive && styles.typeChipTextActive,
-                      ]}
-                    >
-                      {type}
-                    </Text>
+                    <View style={styles.typeOptionLeft}>
+                      <Ionicons
+                        name={isActive ? 'radio-button-on' : 'radio-button-off'}
+                        size={20}
+                        color={isActive ? COLORS.primary : COLORS.textDim}
+                      />
+                      <View style={{ flex: 1 }}>
+                        <View style={styles.typeTitleRow}>
+                          <Text style={[styles.typeTitle, isActive && styles.typeTitleActive]}>
+                            {info?.label || type}
+                          </Text>
+                          {info?.tag && (
+                            <View style={[styles.typeTag, isActive && styles.typeTagActive]}>
+                              <Text style={[styles.typeTagText, isActive && styles.typeTagTextActive]}>
+                                {info.tag}
+                              </Text>
+                            </View>
+                          )}
+                        </View>
+                        {info?.description && (
+                          <Text style={styles.typeDesc}>{info.description}</Text>
+                        )}
+                      </View>
+                    </View>
+                    <View style={styles.typePriceBox}>
+                      <Text style={[styles.typePrice, isActive && styles.typePriceActive]}>
+                        {formatPrice(catPrice)}
+                      </Text>
+                      {catPrice > 0 && (
+                        <Text style={styles.typePriceUnit}>/ ticket</Text>
+                      )}
+                    </View>
                   </TouchableOpacity>
                 );
               })}
@@ -315,22 +341,22 @@ export default function BookingScreen() {
             <View style={styles.priceCard}>
               <View style={styles.priceRow}>
                 <Text style={styles.priceLabel}>
-                  {quantity} × {ticketType} ticket{quantity > 1 ? 's' : ''}
+                  {quantity} × {ticketType} ({isFree ? 'Free' : `${formatCurrency(unitPrice)} each`})
                 </Text>
                 <Text style={styles.priceValue}>
-                  {isFree ? 'Free' : `$${(price * quantity).toFixed(2)}`}
+                  {isFree ? 'Free' : formatCurrency(unitPrice * quantity)}
                 </Text>
               </View>
               {!isFree && (
                 <>
                   <View style={styles.priceRow}>
                     <Text style={styles.priceLabel}>Processing fee (5%)</Text>
-                    <Text style={styles.priceValue}>${fee.toFixed(2)}</Text>
+                    <Text style={styles.priceValue}>{formatCurrency(fee)}</Text>
                   </View>
                   <View style={styles.priceDivider} />
                   <View style={styles.priceRow}>
                     <Text style={styles.totalLabel}>Total Amount</Text>
-                    <Text style={styles.totalValue}>${total.toFixed(2)}</Text>
+                    <Text style={styles.totalValue}>{formatCurrency(total)}</Text>
                   </View>
                 </>
               )}
@@ -346,7 +372,7 @@ export default function BookingScreen() {
           {/* Confirm Button */}
           <View style={styles.confirmBtnSection}>
             <PrimaryButton
-              title={isFree ? 'Confirm Free Booking' : `Confirm & Pay $${total.toFixed(2)}`}
+              title={isFree ? 'Confirm Free Booking' : `Confirm & Pay ${formatCurrency(total)}`}
               onPress={handleBook}
               isLoading={isLoading}
               size="lg"
@@ -448,31 +474,81 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginBottom: 10,
   },
-  typeGrid: {
+  typeList: {
+    gap: 10,
+  },
+  typeOption: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 14,
+    borderRadius: 14,
+    backgroundColor: COLORS.white,
+    borderWidth: 1.5,
+    borderColor: COLORS.border,
+    gap: 12,
+  },
+  typeOptionActive: {
+    borderColor: COLORS.primary,
+    backgroundColor: '#F5F3FF',
+  },
+  typeOptionLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+  },
+  typeTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 8,
   },
-  typeChip: {
-    paddingHorizontal: 16,
-    paddingVertical: 9,
-    borderRadius: 20,
-    backgroundColor: COLORS.white,
-    borderWidth: 1,
-    borderColor: COLORS.border,
+  typeTitle: {
+    color: COLORS.text,
+    fontSize: 14,
+    fontWeight: '700',
   },
-  typeChipActive: {
-    borderColor: COLORS.primary,
+  typeTitleActive: {
+    color: COLORS.primaryDark,
+  },
+  typeTag: {
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 6,
+    backgroundColor: COLORS.surfaceLight,
+  },
+  typeTagActive: {
     backgroundColor: COLORS.primaryLight,
   },
-  typeChipText: {
+  typeTagText: {
     color: COLORS.textMuted,
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  typeChipTextActive: {
-    color: COLORS.primary,
+    fontSize: 10,
     fontWeight: '700',
+    textTransform: 'uppercase',
+  },
+  typeTagTextActive: {
+    color: COLORS.primary,
+  },
+  typeDesc: {
+    color: COLORS.textMuted,
+    fontSize: 12,
+    marginTop: 2,
+  },
+  typePriceBox: {
+    alignItems: 'flex-end',
+  },
+  typePrice: {
+    color: COLORS.text,
+    fontSize: 15,
+    fontWeight: '800',
+  },
+  typePriceActive: {
+    color: COLORS.primary,
+  },
+  typePriceUnit: {
+    color: COLORS.textDim,
+    fontSize: 11,
+    marginTop: 1,
   },
   quantityRow: {
     flexDirection: 'row',

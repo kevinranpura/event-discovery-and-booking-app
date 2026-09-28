@@ -24,40 +24,40 @@ const seed = async () => {
     // Seed users
     const userResult = await client.query(`
       INSERT INTO users (name, email, mobile, password, role) VALUES
-      ('Alex Johnson', 'user@example.com', '+1234567890', $1, 'user'),
-      ('Sarah Chen', 'organizer@example.com', '+0987654321', $1, 'organizer'),
-      ('Mike Williams', 'mike@example.com', '+1122334455', $1, 'user')
+      ('Aarav Sharma', 'user@example.com', '+91 98765 43210', $1, 'user'),
+      ('Priya Patel', 'organizer@example.com', '+91 98111 22334', $1, 'organizer'),
+      ('Rohan Verma', 'mike@example.com', '+91 98222 33445', $1, 'user')
       RETURNING id, role
     `, [hashedPassword]);
 
     const organizerId = userResult.rows.find(r => r.role === 'organizer').id;
     const userId = userResult.rows.find(r => r.role === 'user' && true).id;
 
-    // Seed events
+    // Seed events with Indian venues, addresses and INR prices
     const eventsResult = await client.query(`
       INSERT INTO events (organizer_id, name, description, category, image, date, start_time, end_time, venue, address, ticket_price, total_seats, available_seats) VALUES
-      ($1, 'Summer Music Festival 2026', 'Experience an unforgettable summer with top artists performing live. Three stages, 20+ artists, food vendors, and a spectacular light show!', 'Music', 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800', '2026-10-15', '18:00', '23:00', 'Central Park Amphitheater', '123 Park Ave, New York, NY 10001', 79.99, 500, 320),
-      ($1, 'Tech Innovation Summit', 'Join industry leaders and innovators for a day of talks, workshops, and networking. Explore the future of AI, Web3, and sustainable tech.', 'Technology', 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800', '2026-10-20', '09:00', '18:00', 'Silicon Valley Convention Center', '456 Tech Blvd, San Jose, CA 95002', 149.99, 300, 145),
-      ($1, 'NBA All-Star Weekend', 'Watch the world''s best basketball players compete in the most exciting weekend in sports. Skills challenge, dunk contest, and the big game!', 'Sports', 'https://images.unsplash.com/photo-1546519638405-a9f41bb63a4f?w=800', '2026-10-25', '14:00', '22:00', 'Madison Square Garden', '4 Pennsylvania Plaza, New York, NY 10001', 199.99, 1000, 230),
-      ($1, 'Business Leadership Conference', 'Connect with top executives and entrepreneurs. Learn strategies for growth, innovation, and leadership excellence in today''s competitive market.', 'Business', 'https://images.unsplash.com/photo-1556761175-4b46a572b786?w=800', '2026-11-05', '08:00', '17:00', 'Grand Hyatt Ballroom', '789 Business Ave, Chicago, IL 60601', 299.99, 200, 87),
-      ($1, 'Digital Art & Design Workshop', 'A hands-on workshop covering UI/UX design, digital illustration, and motion graphics. Suitable for beginners and professionals alike.', 'Workshops', 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800', '2026-11-10', '10:00', '16:00', 'Creative Hub Studio', '321 Art Street, Austin, TX 78701', 49.99, 50, 22),
-      ($1, 'EDM Night: Neon Dreams', 'The biggest electronic dance music event of the year. World-class DJs, stunning visuals, and an energy that will keep you dancing all night!', 'Entertainment', 'https://images.unsplash.com/photo-1571085255226-72b7c65b15e3?w=800', '2026-10-30', '21:00', '04:00', 'Club Spectrum', '555 Night Ave, Las Vegas, NV 89101', 89.99, 400, 178),
-      ($1, 'Python & Machine Learning Bootcamp', 'Intensive 2-day bootcamp covering Python fundamentals, data science, and machine learning with real-world projects.', 'Education', 'https://images.unsplash.com/photo-1587620962725-abab7fe55159?w=800', '2026-11-15', '09:00', '18:00', 'Code Academy Campus', '999 Learn Lane, Seattle, WA 98101', 399.99, 100, 45),
-      ($1, 'Jazz Under the Stars', 'An intimate evening of world-class jazz music performed under the open sky. Featuring Grammy-winning artists and special surprise guests.', 'Music', 'https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?w=800', '2026-10-18', '19:30', '22:30', 'Rooftop Garden Venue', '777 Skyline Blvd, San Francisco, CA 94101', 59.99, 150, 89),
-      ($1, 'Marathon & Fun Run 2026', 'Join thousands of runners in this annual city marathon event. Categories for all fitness levels from 5K fun run to full 42K marathon.', 'Sports', 'https://images.unsplash.com/photo-1452421822248-d4c2b47f0c81?w=800', '2026-11-02', '06:00', '14:00', 'City Sports Park', '100 Runner''s Way, Boston, MA 02101', 35.00, 800, 612),
-      ($1, 'Startup Pitch Competition', 'Watch promising startups pitch to top investors. Network with founders, VCs, and industry experts. Winner receives $50,000 in funding!', 'Business', 'https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=800', '2026-11-20', '10:00', '18:00', 'Innovation Hub', '888 Venture Ave, San Francisco, CA 94102', 0, 250, 198)
+      ($1, 'Sunburn Arena Live 2026', 'Experience an unforgettable summer with top artists performing live. Multi-genre stages, 20+ artists, food trucks, and an immersive sound experience!', 'Music', 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800', '2026-10-15', '18:00', '23:00', 'Jio World Garden', 'Bandra Kurla Complex, Bandra East, Mumbai, Maharashtra 400051', 1499.00, 500, 320),
+      ($1, 'India Tech Innovation Summit', 'Join industry leaders and innovators for a day of talks, workshops, and networking. Explore the future of AI, Web3, and sustainable tech in India.', 'Technology', 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800', '2026-10-20', '09:00', '18:00', 'KTPO Convention Centre', 'Whitefield Main Rd, EPIP Zone, Bengaluru, Karnataka 560066', 2999.00, 300, 145),
+      ($1, 'IPL T20 Blockbuster Clash', 'Watch the country''s top cricket franchises clash under the floodlights in a thrilling high-octane stadium atmosphere.', 'Sports', 'https://images.unsplash.com/photo-1546519638405-a9f41bb63a4f?w=800', '2026-10-25', '19:30', '23:30', 'Wankhede Stadium', 'D Road, Churchgate, Mumbai, Maharashtra 400020', 1200.00, 1000, 230),
+      ($1, 'National Business Leadership Conclave', 'Connect with India''s top executives, founders, and venture capitalists. Strategic insights for growth, scaling, and operational excellence.', 'Business', 'https://images.unsplash.com/photo-1556761175-4b46a572b786?w=800', '2026-11-05', '08:30', '17:30', 'The Leela Palace Ballroom', 'Old Airport Road, Kodihalli, Bengaluru, Karnataka 560008', 4999.00, 200, 87),
+      ($1, 'Digital UI/UX & Figma Masterclass', 'A hands-on workshop covering product design, design systems, prototyping, and accessibility for modern web and mobile apps.', 'Workshops', 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800', '2026-11-10', '10:00', '16:00', '91springboard Tech Park', 'George Thangaiah Complex, Indiranagar, Bengaluru, Karnataka 560038', 799.00, 50, 22),
+      ($1, 'Bollywood & EDM Sunsets Festival', 'The biggest dance music and fusion celebration on the coast. Headline DJs, sunset beach stage, and non-stop festival vibes.', 'Entertainment', 'https://images.unsplash.com/photo-1571085255226-72b7c65b15e3?w=800', '2026-10-30', '17:00', '02:00', 'Vagator Beach Grounds', 'Vagator Beach Road, Anjuna, Goa 403509', 1999.00, 400, 178),
+      ($1, 'AI & GenAI Developers Bootcamp', 'Intensive 2-day bootcamp covering LLMs, LangChain, RAG pipelines, and model evaluation with real-world enterprise projects.', 'Education', 'https://images.unsplash.com/photo-1587620962725-abab7fe55159?w=800', '2026-11-15', '09:00', '18:00', 'IIT Delhi Research Park', 'Hauz Khas, New Delhi, Delhi 110016', 3499.00, 100, 45),
+      ($1, 'Acoustic Sufi & Jazz Rooftop Nights', 'An intimate open-air skyline evening featuring celebrated Indian fusion musicians and soulful live acoustic performances.', 'Music', 'https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?w=800', '2026-10-18', '19:30', '22:30', 'Aer Rooftop Lounge', 'Four Seasons Hotel, Worli, Mumbai, Maharashtra 400018', 899.00, 150, 89),
+      ($1, 'Mumbai Coastal Marathon & 10K', 'Run along Mumbai''s scenic coastal route. Timed bibs, finisher medals, and hydration stations for all categories.', 'Sports', 'https://images.unsplash.com/photo-1452421822248-d4c2b47f0c81?w=800', '2026-11-02', '05:30', '11:00', 'Bandra Fort Promenade', 'Byramji Jeejeebhoy Road, Bandra West, Mumbai, Maharashtra 400050', 599.00, 800, 612),
+      ($1, 'Bengaluru Startup Pitch Fest 2026', 'Watch high-growth Indian startups pitch live to leading angel networks and venture capitalists. Free open admission for ecosystem builders.', 'Business', 'https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=800', '2026-11-20', '10:00', '18:00', 'WeWork Galaxy', '43 Residency Road, Shanthala Nagar, Bengaluru, Karnataka 560025', 0, 250, 198)
       RETURNING id
     `, [organizerId]);
 
     const eventIds = eventsResult.rows.map(r => r.id);
 
-    // Seed bookings for userId and mike
+    // Seed bookings for userId and mike with INR pricing
     await client.query(`
       INSERT INTO bookings (user_id, event_id, ticket_type, quantity, total_amount, status) VALUES
-      ($1, $2, 'VIP', 2, 167.98, 'confirmed'),
-      ($1, $3, 'General', 1, 157.49, 'confirmed'),
-      ($4, $2, 'General', 1, 83.99, 'confirmed'),
-      ($4, $5, 'General', 2, 104.98, 'pending')
+      ($1, $2, 'VIP', 2, 3147.90, 'confirmed'),
+      ($1, $3, 'General', 1, 3148.95, 'confirmed'),
+      ($4, $2, 'General', 1, 1573.95, 'confirmed'),
+      ($4, $5, 'General', 2, 1677.90, 'pending')
     `, [userId, eventIds[0], eventIds[1], userResult.rows[2].id, eventIds[4]]);
 
     // Seed favorites for userId

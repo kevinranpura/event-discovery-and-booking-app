@@ -100,7 +100,7 @@ export function FilterModal({
             <View style={styles.priceRow}>
               <View style={{ flex: 1 }}>
                 <InputField
-                  label="Min ($)"
+                  label="Min (₹)"
                   value={filters.minPrice || ''}
                   onChangeText={(v) => update('minPrice', v)}
                   placeholder="0"
@@ -110,10 +110,10 @@ export function FilterModal({
               </View>
               <View style={{ flex: 1 }}>
                 <InputField
-                  label="Max ($)"
+                  label="Max (₹)"
                   value={filters.maxPrice || ''}
                   onChangeText={(v) => update('maxPrice', v)}
-                  placeholder="500"
+                  placeholder="5000"
                   keyboardType="decimal-pad"
                   leftIcon="card-outline"
                 />
@@ -125,7 +125,7 @@ export function FilterModal({
               label="Location / City"
               value={filters.location || ''}
               onChangeText={(v) => update('location', v)}
-              placeholder="New York"
+              placeholder="Mumbai, Bengaluru, Delhi..."
               leftIcon="location-outline"
             />
           </ScrollView>
