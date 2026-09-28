@@ -63,8 +63,18 @@ export const useEventsStore = create<EventsStore>((set, get) => ({
   createEvent: async (data) => {
     set({ isLoading: true });
     try {
-      await eventsService.createEvent(data);
-      set({ isLoading: false });
+      const res = await eventsService.createEvent(data);
+      const newEvent = res.data?.data?.event || res.data?.event;
+      if (newEvent) {
+        set((state) => ({
+          events: [newEvent, ...state.events.filter((e) => e.id !== newEvent.id)],
+          isLoading: false,
+        }));
+      } else {
+        await get().fetchEvents();
+        set({ isLoading: false });
+      }
+      return newEvent;
     } catch (err: any) {
       set({ isLoading: false });
       throw err;
@@ -74,8 +84,19 @@ export const useEventsStore = create<EventsStore>((set, get) => ({
   updateEvent: async (id, data) => {
     set({ isLoading: true });
     try {
-      await eventsService.updateEvent(id, data);
-      set({ isLoading: false });
+      const res = await eventsService.updateEvent(id, data);
+      const updated = res.data?.data?.event || res.data?.event;
+      if (updated) {
+        set((state) => ({
+          events: state.events.map((e) => (e.id === id ? { ...e, ...updated } : e)),
+          selectedEvent: state.selectedEvent?.id === id ? { ...state.selectedEvent, ...updated } : state.selectedEvent,
+          isLoading: false,
+        }));
+      } else {
+        await get().fetchEvents();
+        set({ isLoading: false });
+      }
+      return updated;
     } catch (err: any) {
       set({ isLoading: false });
       throw err;

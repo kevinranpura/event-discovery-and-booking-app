@@ -25,7 +25,7 @@ const seed = async () => {
     const userResult = await client.query(`
       INSERT INTO users (name, email, mobile, password, role) VALUES
       ('Aarav Sharma', 'user@example.com', '+91 98765 43210', $1, 'user'),
-      ('Priya Patel', 'organizer@example.com', '+91 98111 22334', $1, 'organizer'),
+      ('Aryan Patel', 'organizer@example.com', '+91 98111 22334', $1, 'organizer'),
       ('Rohan Verma', 'mike@example.com', '+91 98222 33445', $1, 'user')
       RETURNING id, role
     `, [hashedPassword]);

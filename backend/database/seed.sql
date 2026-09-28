@@ -4,7 +4,7 @@
 -- Demo Users (Password: password123, pre-hashed using bcryptjs)
 INSERT INTO users (name, email, mobile, password, role) VALUES
 ('Aarav Sharma', 'user@example.com', '+91 98765 43210', '$2a$10$w8T9V.bBw8pC0n1qE5h/teYf8F2sH6iK4mP0rL8vU2wX4yZ6aB8cC', 'user'),
-('Priya Patel', 'organizer@example.com', '+91 98111 22334', '$2a$10$w8T9V.bBw8pC0n1qE5h/teYf8F2sH6iK4mP0rL8vU2wX4yZ6aB8cC', 'organizer'),
+('Aryan Patel', 'organizer@example.com', '+91 98111 22334', '$2a$10$w8T9V.bBw8pC0n1qE5h/teYf8F2sH6iK4mP0rL8vU2wX4yZ6aB8cC', 'organizer'),
 ('Rohan Verma', 'mike@example.com', '+91 98222 33445', '$2a$10$w8T9V.bBw8pC0n1qE5h/teYf8F2sH6iK4mP0rL8vU2wX4yZ6aB8cC', 'user')
 ON CONFLICT (email) DO NOTHING;
 

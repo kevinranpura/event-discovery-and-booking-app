@@ -26,7 +26,7 @@ const initialForm: FormData = {
 
 export default function CreateEventScreen() {
   const { eventId } = useLocalSearchParams<{ eventId?: string }>();
-  const { createEvent, updateEvent, isLoading } = useEventsStore();
+  const { createEvent, updateEvent, fetchEvents, isLoading } = useEventsStore();
   const [form, setForm] = useState<FormData>(initialForm);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
   const [isEditing, setIsEditing] = useState(false);
@@ -68,8 +68,23 @@ export default function CreateEventScreen() {
     if (!validate()) return;
     try {
       const payload = { ...form, ticket_price: parseFloat(form.ticket_price), total_seats: parseInt(form.total_seats) };
-      if (isEditing && eventId) { await updateEvent(parseInt(eventId), payload); Alert.alert('Success', 'Event updated successfully!', [{ text: 'OK', onPress: () => router.back() }]); }
-      else { await createEvent(payload); Alert.alert('Success', 'Event created successfully!', [{ text: 'OK', onPress: () => router.back() }]); }
+      if (isEditing && eventId) {
+        await updateEvent(parseInt(eventId), payload);
+        await fetchEvents();
+        if (Platform.OS === 'web') {
+          router.replace('/organizer/dashboard');
+        } else {
+          Alert.alert('Success', 'Event updated successfully!', [{ text: 'OK', onPress: () => router.replace('/organizer/dashboard') }]);
+        }
+      } else {
+        await createEvent(payload);
+        await fetchEvents();
+        if (Platform.OS === 'web') {
+          router.replace('/organizer/dashboard');
+        } else {
+          Alert.alert('Success', 'Event created successfully!', [{ text: 'OK', onPress: () => router.replace('/organizer/dashboard') }]);
+        }
+      }
     } catch (err: any) { Alert.alert('Error', err.message); }
   };
 

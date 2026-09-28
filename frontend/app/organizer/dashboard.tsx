@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View, Text, StyleSheet, FlatList, TouchableOpacity,
   Alert, RefreshControl,
@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 import { useAuthStore } from '../../store/authStore';
 import { useEventsStore } from '../../store/eventsStore';
 import { organizerService } from '../../services/bookingsService';
@@ -31,28 +32,39 @@ interface DashboardStats {
 }
 
 export default function OrganizerDashboard() {
-  const { user, logout } = useAuthStore();
+  const { user, logout, loadUser } = useAuthStore();
   const { events, isLoading, fetchEvents, deleteEvent } = useEventsStore();
+  const [organizerEvents, setOrganizerEvents] = useState<Event[] | null>(null);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
-    await fetchEvents();
+  const loadData = useCallback(async () => {
     try {
-      const res = await organizerService.getDashboard();
-      setStats(res.data.stats);
-    } catch { }
-  };
+      const [dashRes, orgEventsRes] = await Promise.all([
+        organizerService.getDashboard(),
+        organizerService.getOrganizerEvents(),
+        fetchEvents(),
+        loadUser(),
+      ]);
+      if (dashRes?.data?.stats) setStats(dashRes.data.stats);
+      const fetched = orgEventsRes?.data?.data?.events || orgEventsRes?.data?.events;
+      if (fetched) setOrganizerEvents(fetched);
+    } catch {
+      await fetchEvents();
+    }
+  }, [fetchEvents, loadUser]);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadData();
+    }, [loadData])
+  );
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await loadData();
     setRefreshing(false);
-  }, []);
+  }, [loadData]);
 
   const handleDelete = (event: Event) => {
     showConfirmDialog(
@@ -61,6 +73,8 @@ export default function OrganizerDashboard() {
       async () => {
         try {
           await deleteEvent(event.id);
+          setOrganizerEvents((prev) => (prev ? prev.filter((e) => e.id !== event.id) : null));
+          await loadData();
         } catch (err: any) {
           Alert.alert('Error', err.message);
         }
@@ -81,6 +95,8 @@ export default function OrganizerDashboard() {
     );
   };
 
+  const displayEvents = organizerEvents || events;
+
   const statCards = stats ? [
     { label: 'Total Events', value: stats.totalEvents ?? stats.total_events ?? 0, iconName: 'calendar', color: COLORS.primary },
     { label: 'Upcoming', value: stats.upcomingEvents ?? stats.upcoming_events ?? 0, iconName: 'time', color: COLORS.success },
@@ -93,7 +109,7 @@ export default function OrganizerDashboard() {
       <View style={styles.header}>
         <View>
           <Text style={styles.welcomeText}>Organizer Dashboard</Text>
-          <Text style={styles.orgName}>{user?.name?.split(' ')[0] || 'Organizer'}</Text>
+          <Text style={styles.orgName}>{user?.name?.split(' ')[0] || 'Aryan'}</Text>
         </View>
         <View style={styles.headerActions}>
           <TouchableOpacity onPress={handleLogout} style={styles.iconBtn}>
@@ -103,7 +119,7 @@ export default function OrganizerDashboard() {
       </View>
 
       <FlatList
-        data={events}
+        data={displayEvents}
         keyExtractor={(item) => item.id.toString()}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />}
         ListHeaderComponent={
@@ -130,7 +146,7 @@ export default function OrganizerDashboard() {
                 icon={<Ionicons name="add-circle-outline" size={18} color={COLORS.white} />}
               />
             </View>
-            <Text style={styles.sectionTitle}>Your Events ({events.length})</Text>
+            <Text style={styles.sectionTitle}>Your Events ({displayEvents.length})</Text>
           </View>
         }
         renderItem={({ item }) => {
